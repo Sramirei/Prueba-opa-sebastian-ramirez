@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Optimizador de Equipo para Escalada</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .card {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .result-card {
+        background-color: #f8f9fa;
+        border-left: 5px solid #0d6efd;
+      }
+      .element-item {
+        padding: 10px;
+        margin-bottom: 5px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+      }
+      .edit-modal .modal-dialog {
+        max-width: 500px;
+      }
+      @media (max-width: 768px) {
+        .input-group {
+          flex-direction: column;
+        }
+        .input-group .form-control,
+        .input-group .btn {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-5">
+      <h1 class="text-center mb-4">Optimizador de Equipo para Escalada</h1>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h5>Parámetros de Búsqueda</h5>
+            </div>
+            <div class="card-body">
+              <form id="searchForm">
+                <div class="mb-3">
+                  <label for="minCalories" class="form-label"
+                    >Mínimo de Calorías Requeridas</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="minCalories"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="maxWeight" class="form-label"
+                    >Peso Máximo Permitido (kg)</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="maxWeight"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  Calcular Combinación Óptima
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+              <h5>Agregar Nuevo Elemento</h5>
+            </div>
+            <div class="card-body">
+              <form id="elementForm">
+                <div class="mb-3">
+                  <label for="elementName" class="form-label"
+                    >Nombre del Elemento</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="elementName"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="elementWeight" class="form-label"
+                    >Peso (kg)</label
+                  >
+                  <input
+                    type="number"
+                    step="0.1"
+                    class="form-control"
+                    id="elementWeight"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="elementCalories" class="form-label"
+                    >Calorías</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="elementCalories"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-success">
+                  Agregar Elemento
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card result-card">
+            <div class="card-header bg-info text-white">
+              <h5>Resultados</h5>
+            </div>
+            <div class="card-body">
+              <div id="resultsContainer">
+                <p class="text-muted">
+                  Ingrese los parámetros y elementos para calcular la
+                  combinación óptima.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mt-4">
+            <div
+              class="card-header bg-secondary text-white d-flex justify-content-between align-items-center"
+            >
+              <h5>Elementos Disponibles</h5>
+              <button id="clearElements" class="btn btn-sm btn-danger">
+                Limpiar Todos
+              </button>
+            </div>
+            <div class="card-body">
+              <div id="elementsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para editar elemento -->
+    <div
+      class="modal fade edit-modal"
+      id="editElementModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Elemento</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editElementForm">
+              <input type="hidden" id="editElementId" />
+              <div class="mb-3">
+                <label for="editElementName" class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editElementName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editElementWeight" class="form-label"
+                  >Peso (kg)</label
+                >
+                <input
+                  type="number"
+                  step="0.1"
+                  class="form-control"
+                  id="editElementWeight"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editElementCalories" class="form-label"
+                  >Calorías</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="editElementCalories"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button type="button" id="saveEditElement" class="btn btn-primary">
+              Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Clase para manejar el almacenamiento
+
+      const DEFAULT_ELEMENTS = [
+        { id: 1, name: "Barra energética", weight: 0.2, calories: 250 },
+        { id: 2, name: "Frutos secos", weight: 0.3, calories: 180 },
+        { id: 3, name: "Agua (1L)", weight: 1.0, calories: 0 },
+        { id: 4, name: "Bebida isotónica", weight: 0.5, calories: 120 },
+        { id: 5, name: "Chocolate", weight: 0.15, calories: 200 },
+        { id: 6, name: "Cuerda (30m)", weight: 2.5, calories: 0 },
+        { id: 7, name: "Mosquetones", weight: 0.4, calories: 0 },
+        { id: 8, name: "Arnés", weight: 0.8, calories: 0 },
+        { id: 9, name: "Casco", weight: 0.5, calories: 0 },
+        { id: 10, name: "Botiquín básico", weight: 0.7, calories: 0 },
+      ];
+
+      class StorageManager {
+        constructor() {
+          this.elementsKey = "climbingElements";
+          this.settingsKey = "climbingSettings";
+          this.lastIdKey = "lastElementId";
+        }
+
+        // Guardar elementos en localStorage
+        saveElements(elements) {
+          localStorage.setItem(this.elementsKey, JSON.stringify(elements));
+          sessionStorage.setItem(this.elementsKey, JSON.stringify(elements));
+        }
+
+        // Cargar elementos desde localStorage
+        loadElements() {
+          const storedElements = localStorage.getItem(this.elementsKey);
+
+          // Si no hay elementos guardados, usar los predeterminados
+          if (!storedElements) {
+            this.saveElements(DEFAULT_ELEMENTS);
+            localStorage.setItem(this.lastIdKey, "10"); // Último ID de elementos predeterminados
+            return DEFAULT_ELEMENTS;
+          }
+
+          return JSON.parse(storedElements);
+        }
+
+        // Guardar configuración en cookies
+        saveSettings(settings) {
+          document.cookie = `${this.settingsKey}=${JSON.stringify(
+            settings
+          )}; path=/; max-age=86400`; // 1 día
+        }
+
+        // Cargar configuración desde cookies
+        loadSettings() {
+          const cookieValue = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith(`${this.settingsKey}=`))
+            ?.split("=")[1];
+          return cookieValue ? JSON.parse(cookieValue) : null;
+        }
+
+        // Obtener y guardar el último ID usado
+        getNextId() {
+          const lastId = parseInt(localStorage.getItem(this.lastIdKey)) || 0;
+          const nextId = lastId + 1;
+          localStorage.setItem(this.lastIdKey, nextId.toString());
+          return nextId;
+        }
+
+        // Limpiar todos los datos almacenados
+        clearAll() {
+          localStorage.removeItem(this.elementsKey);
+          sessionStorage.removeItem(this.elementsKey);
+          localStorage.removeItem(this.lastIdKey);
+          document.cookie = `${this.settingsKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        }
+      }
+
+      // Clase para manejar la lógica de combinación de elementos
+      class CombinationFinder {
+        constructor(elements) {
+          this.elements = elements;
+        }
+
+        // Generar todas las combinaciones posibles
+        getAllCombinations() {
+          const result = [];
+          const fn = (active, rest, a) => {
+            if (active.length === 0 && rest.length === 0) return;
+            if (rest.length === 0) {
+              result.push(active);
+            } else {
+              fn([...active, rest[0]], rest.slice(1), a);
+              fn(active, rest.slice(1), a);
+            }
+          };
+          fn([], this.elements, 0);
+          return result.filter((comb) => comb.length > 0);
+        }
+
+        // Encontrar la mejor combinación
+        findBestCombination(minCalories, maxWeight) {
+          const combinations = this.getAllCombinations();
+          let bestCombination = null;
+          let maxCalories = 0;
+          let minWeight = Infinity;
+
+          combinations.forEach((combination) => {
+            const totalWeight = combination.reduce(
+              (sum, el) => sum + el.weight,
+              0
+            );
+            const totalCalories = combination.reduce(
+              (sum, el) => sum + el.calories,
+              0
+            );
+
+            if (totalWeight <= maxWeight && totalCalories >= minCalories) {
+              if (
+                totalCalories > maxCalories ||
+                (totalCalories === maxCalories && totalWeight < minWeight)
+              ) {
+                maxCalories = totalCalories;
+                minWeight = totalWeight;
+                bestCombination = combination;
+              }
+            }
+          });
+
+          return bestCombination;
+        }
+      }
+
+      // Clase principal de la aplicación
+      class ClimbingOptimizerApp {
+        constructor() {
+          this.storage = new StorageManager();
+          this.elements = this.storage.loadElements();
+          this.editModal = new bootstrap.Modal(
+            document.getElementById("editElementModal")
+          );
+
+          // Inicializar formularios
+          this.searchForm = document.getElementById("searchForm");
+          this.elementForm = document.getElementById("elementForm");
+          this.editElementForm = document.getElementById("editElementForm");
+          this.clearElementsBtn = document.getElementById("clearElements");
+          this.saveEditBtn = document.getElementById("saveEditElement");
+          this.resultsContainer = document.getElementById("resultsContainer");
+          this.elementsList = document.getElementById("elementsList");
+
+          // Cargar configuración si existe
+          const settings = this.storage.loadSettings();
+          if (settings) {
+            document.getElementById("minCalories").value =
+              settings.minCalories || "";
+            document.getElementById("maxWeight").value =
+              settings.maxWeight || "";
+          }
+
+          // Configurar event listeners
+          this.setupEventListeners();
+          this.renderElementsList();
+        }
+
+        setupEventListeners() {
+          // Formulario de búsqueda
+          this.searchForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const minCalories = parseFloat(
+              document.getElementById("minCalories").value
+            );
+            const maxWeight = parseFloat(
+              document.getElementById("maxWeight").value
+            );
+
+            // Validar entrada
+            if (isNaN(minCalories) || isNaN(maxWeight)) {
+              alert("Por favor ingrese valores válidos");
+              return;
+            }
+
+            // Guardar configuración
+            this.storage.saveSettings({ minCalories, maxWeight });
+
+            // Encontrar y mostrar resultados
+            this.findAndDisplayResults(minCalories, maxWeight);
+          });
+
+          // Formulario de elementos
+          this.elementForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            this.addNewElement();
+          });
+
+          // Botón para limpiar elementos
+          this.clearElementsBtn.addEventListener("click", () => {
+            if (
+              confirm("¿Está seguro que desea eliminar todos los elementos?")
+            ) {
+              this.elements = [];
+              this.storage.saveElements(this.elements);
+              this.renderElementsList();
+              this.resultsContainer.innerHTML =
+                '<p class="text-muted">Ingrese los parámetros y elementos para calcular la combinación óptima.</p>';
+            }
+          });
+
+          // Botón para guardar edición
+          this.saveEditBtn.addEventListener("click", () => {
+            this.saveEditedElement();
+          });
+        }
+
+        addNewElement() {
+          const name = document.getElementById("elementName").value.trim();
+          const weight = parseFloat(
+            document.getElementById("elementWeight").value
+          );
+          const calories = parseInt(
+            document.getElementById("elementCalories").value
+          );
+
+          // Validar entrada
+          if (name === "" || isNaN(weight) || isNaN(calories)) {
+            alert("Por favor complete todos los campos correctamente");
+            return;
+          }
+
+          // Crear nuevo elemento con ID automático
+          const newElement = {
+            id: this.storage.getNextId(),
+            name,
+            weight,
+            calories,
+          };
+
+          // Agregar nuevo elemento
+          this.elements.push(newElement);
+          this.storage.saveElements(this.elements);
+
+          // Limpiar formulario y actualizar lista
+          this.elementForm.reset();
+          this.renderElementsList();
+        }
+
+        editElement(elementId) {
+          const element = this.elements.find((el) => el.id === elementId);
+          if (!element) return;
+
+          // Llenar el formulario de edición
+          document.getElementById("editElementId").value = element.id;
+          document.getElementById("editElementName").value = element.name;
+          document.getElementById("editElementWeight").value = element.weight;
+          document.getElementById("editElementCalories").value =
+            element.calories;
+
+          // Mostrar modal
+          this.editModal.show();
+        }
+
+        saveEditedElement() {
+          const id = parseInt(document.getElementById("editElementId").value);
+          const name = document.getElementById("editElementName").value.trim();
+          const weight = parseFloat(
+            document.getElementById("editElementWeight").value
+          );
+          const calories = parseInt(
+            document.getElementById("editElementCalories").value
+          );
+
+          // Validar entrada
+          if (name === "" || isNaN(weight) || isNaN(calories)) {
+            alert("Por favor complete todos los campos correctamente");
+            return;
+          }
+
+          // Actualizar elemento
+          const index = this.elements.findIndex((el) => el.id === id);
+          if (index !== -1) {
+            this.elements[index] = { id, name, weight, calories };
+            this.storage.saveElements(this.elements);
+            this.renderElementsList();
+            this.editModal.hide();
+
+            // Actualizar resultados si estaban mostrándose
+            const settings = this.storage.loadSettings();
+            if (settings && settings.minCalories && settings.maxWeight) {
+              this.findAndDisplayResults(
+                settings.minCalories,
+                settings.maxWeight
+              );
+            }
+          }
+        }
+
+        deleteElement(elementId) {
+          if (confirm("¿Está seguro que desea eliminar este elemento?")) {
+            this.elements = this.elements.filter((el) => el.id !== elementId);
+            this.storage.saveElements(this.elements);
+            this.renderElementsList();
+
+            // Actualizar resultados si estaban mostrándose
+            const settings = this.storage.loadSettings();
+            if (settings && settings.minCalories && settings.maxWeight) {
+              this.findAndDisplayResults(
+                settings.minCalories,
+                settings.maxWeight
+              );
+            }
+          }
+        }
+
+        findAndDisplayResults(minCalories, maxWeight) {
+          if (this.elements.length === 0) {
+            this.resultsContainer.innerHTML =
+              '<div class="alert alert-warning">No hay elementos disponibles. Agregue algunos elementos primero.</div>';
+            return;
+          }
+
+          const finder = new CombinationFinder(this.elements);
+          const bestCombination = finder.findBestCombination(
+            minCalories,
+            maxWeight
+          );
+
+          if (bestCombination) {
+            const totalWeight = bestCombination.reduce(
+              (sum, el) => sum + el.weight,
+              0
+            );
+            const totalCalories = bestCombination.reduce(
+              (sum, el) => sum + el.calories,
+              0
+            );
+
+            let html = `
+                        <div class="alert alert-success">
+                            <h5>Mejor Combinación Encontrada</h5>
+                            <p><strong>Elementos:</strong> ${bestCombination
+                              .map((el) => el.name)
+                              .join(", ")}</p>
+                            <p><strong>Peso Total:</strong> ${totalWeight.toFixed(
+                              2
+                            )} kg (de ${maxWeight} kg máximo)</p>
+                            <p><strong>Calorías Totales:</strong> ${totalCalories} (de ${minCalories} mínimo requerido)</p>
+                        </div>
+                        <div class="mt-3">
+                            <h5>Detalle de Elementos Seleccionados</h5>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Peso (kg)</th>
+                                        <th>Calorías</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+            bestCombination.forEach((el) => {
+              html += `
+                            <tr>
+                                <td>${el.name}</td>
+                                <td>${el.weight}</td>
+                                <td>${el.calories}</td>
+                            </tr>
+                        `;
+            });
+
+            html += `
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <h5>Elementos Disponibles No Utilizados</h5>
+                            <ul class="list-group">
+                    `;
+
+            // Mostrar elementos no utilizados
+            const usedIds = bestCombination.map((el) => el.id);
+            const unusedElements = this.elements.filter(
+              (el) => !usedIds.includes(el.id)
+            );
+
+            if (unusedElements.length === 0) {
+              html +=
+                '<li class="list-group-item">Todos los elementos fueron utilizados</li>';
+            } else {
+              unusedElements.forEach((el) => {
+                html += `
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>${el.name} (Peso: ${el.weight} kg, Calorías: ${el.calories})</span>
+                                </li>
+                            `;
+              });
+            }
+
+            html += `
+                            </ul>
+                        </div>
+                    `;
+
+            this.resultsContainer.innerHTML = html;
+          } else {
+            this.resultsContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            No se encontró ninguna combinación que cumpla con los requisitos.
+                            <p>Intente con un peso máximo mayor o un mínimo de calorías menor.</p>
+                            <p>Elementos disponibles:</p>
+                            <ul class="list-group mt-2">
+                    `;
+
+            this.elements.forEach((el) => {
+              this.resultsContainer.innerHTML += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>${el.name} (Peso: ${el.weight} kg, Calorías: ${el.calories})</span>
+                            </li>
+                        `;
+            });
+
+            this.resultsContainer.innerHTML += `</ul></div>`;
+          }
+        }
+
+        renderElementsList() {
+          if (this.elements.length === 0) {
+            this.elementsList.innerHTML =
+              '<p class="text-muted">No hay elementos agregados todavía.</p>';
+            return;
+          }
+
+          // Ordenar elementos por ID
+          this.elements.sort((a, b) => a.id - b.id);
+
+          let html = '<div class="list-group">';
+          this.elements.forEach((el) => {
+            html += `
+                        <div class="list-group-item element-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>#${el.id}: ${el.name}</strong> - Peso: ${el.weight} kg - Calorías: ${el.calories}
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary edit-element" data-id="${el.id}">Editar</button>
+                                <button class="btn btn-sm btn-outline-danger delete-element" data-id="${el.id}">Eliminar</button>
+                            </div>
+                        </div>
+                    `;
+          });
+          html += "</div>";
+
+          this.elementsList.innerHTML = html;
+
+          // Agregar event listeners a los botones
+          document.querySelectorAll(".edit-element").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const id = parseInt(e.target.getAttribute("data-id"));
+              this.editElement(id);
+            });
+          });
+
+          document.querySelectorAll(".delete-element").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const id = parseInt(e.target.getAttribute("data-id"));
+              this.deleteElement(id);
+            });
+          });
+        }
+      }
+
+      // Inicializar la aplicación cuando el DOM esté listo
+      document.addEventListener("DOMContentLoaded", () => {
+        new ClimbingOptimizerApp();
+      });
+    </script>
+  </body>
+</html>

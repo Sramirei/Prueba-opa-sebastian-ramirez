@@ -1,0 +1,21 @@
+FUNCIÓN encontrarElementosOptimos(minCalorias, maxPeso, elementos)
+    VARIABLES:
+        combinaciones ← todas las combinaciones posibles de los elementos
+        solucionesViables ← lista vacía
+
+    PARA cada combinación en combinaciones HACER:
+        pesoTotal ← suma de pesos en la combinación
+        caloriasTotales ← suma de calorías en la combinación
+
+        SI caloriasTotales >= minCalorias Y pesoTotal <= maxPeso ENTONCES
+            AGREGAR combinación a solucionesViables
+        FIN SI
+    FIN PARA
+
+    SI solucionesViables está vacía ENTONCES
+        RETORNAR lista vacía (sin solución)
+    FIN SI
+
+    ORDENAR solucionesViables por pesoTotal ascendente
+    RETORNAR la primera combinación (menor peso viable)
+FIN FUNCIÓN

@@ -1,0 +1,26 @@
+Ejercicio 1: Completar la secuencia
+¿Qué sigue en la secuencia RQP, ONM, LKJ, ___, FED?
+Respuesta: IHG (opción a)
+
+¿Qué sigue en la secuencia KBJ, LCK, MDL, NEM, ___?
+Respuesta: OFN (opción b)
+
+¿Qué número sigue en la secuencia 104, 109, 115, 122, 130, ___?
+Respuesta: 139 (opción c)
+
+¿Qué número sigue en la secuencia 15, 31, 63, 127, 255, ___?
+Respuesta: 511 (opción c)
+
+Ejercicio 2: ¿Desea beber algo?
+¿Quién es el Artista?
+Respuesta: A
+
+¿Quién es el Deportista?
+Respuesta: D
+
+¿Quién es el Médico?
+Respuesta: C
+
+¿Cuál de los siguientes grupos incluye a una persona que prefiere el té pero que no es el juez?
+Respuesta: Ninguno de los anteriores (opción e)
+
